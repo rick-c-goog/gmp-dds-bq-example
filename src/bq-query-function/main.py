@@ -1,6 +1,6 @@
 """Generates a CSV from a Big Query Table."""
 from flask import escape
-from flask import jsonify, make_response
+from flask import jsonify, make_response,request
 import functions_framework
 import google.cloud
 import google.cloud.bigquery
@@ -19,20 +19,68 @@ def bq_query_zipcode(request):
   # Create params for ingestion
   # Month abbreviation, day and year
   
-  destination_uri = "gs://{}/{}".format(bucket_name, import_date + ".csv")
   dataset_ref = google.cloud.bigquery.DatasetReference(project, dataset_id)
-  table_ref = dataset_ref.table(table_id)
-
   query = """
         SELECT  lpad(zipcode,5,'0') as zipcode,population FROM `bigquery-public-data.census_bureau_usa.population_by_zip_2010` where left(lpad(zipcode,5,'0'),3) in ('100','101','102','103','104','111','112','113','114') and population>0
 
     """
+  #table_ref = dataset_ref.table(table_id)
+  args = request.args
+  queryType = args.get('name')
+  if queryType == "citibike":
+     query = """
+        WITH
+    hs AS (
+  SELECT
+    h.start_station_id AS station_name,
+    IF
+    (EXTRACT(DAYOFWEEK
+      FROM
+        h.starttime) = 1
+      OR EXTRACT(DAYOFWEEK
+      FROM
+        h.starttime) = 7,
+      "weekend",
+      "weekday") AS isweekday,
+    (h.stoptime-h.starttime) as duration
+  FROM
+    `bigquery-public-data.new_york_citibike.citibike_trips` AS h
+  JOIN
+    `bigquery-public-data.new_york_citibike.citibike_stations` AS s
+  ON
+    h.start_station_id = s.station_id
+  WHERE
+    h.starttime BETWEEN CAST('2017-01-01 00:00:00' AS datetime) AND CAST('2018-01-01 00:00:00' AS datetime)),
+  stationstats AS (
+  SELECT
+    station_name,
+    AVG(duration) AS duration,
+    COUNT(duration) AS num_trips
+  FROM
+    hs
+  GROUP BY
+    station_name ), 
+  zipcode_geom as(
+    select zipcode, ST_GEOGFROMTEXT(zipcode_geom) as zip_geom from `bigquery-public-data.utility_us.zipcode_area` where left(zipcode,3) in ('100','101','102','103','104','111','112','113','114')),
+  station_geom as (
+    select station_id, ST_GEOGPOINT(longitude,latitude) as station_geom from `bigquery-public-data.new_york_citibike.citibike_stations` 
+  )
+
+SELECT
+  zipcode, sum(num_trips) as total_trips
+FROM zipcode_geom inner join station_geom on ST_CONTAINS(zipcode_geom.zip_geom, station_geom.station_geom) join stationstats on station_geom.station_id=stationstats.station_name
+Group By zipcode_geom.zipcode
+    """
+  
   query_job = client.query(query)  # Make an API request.
 
   result=[]
   for row in query_job:
         # Row values can be accessed by field name or index.
-        result.append({"zipcode": row["zipcode"], "population": ["population"]})
+      if  queryType == "citibike": 
+        result.append({"zipcode": row["zipcode"], "rides": row["total_trips"]})
+      elif queryType == "population":
+        result.append({"zipcode": row["zipcode"], "population": row["population"]})
+        
     # [END bigquery_query]
-  
   return make_response(jsonify(result), 200)
