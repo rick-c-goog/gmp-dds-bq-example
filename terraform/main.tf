@@ -48,7 +48,7 @@ resource "google_storage_bucket" "function_bucket" {
 resource "null_resource" "clean_up_main_python" {
   provisioner "local-exec" {
     command = <<-EOT
-    sed -i "s|PROJECT_ID|${var.bq_project_id}|g" ../src/bq-query-function/main.py  
+    sed -i "s|PROJECT_ID|${local.bq_project_id}|g" ../src/bq-query-function/main.py  
     sed -i "s|DATASET_ID|${local.dataset_id}|g" ../src/bq-query-function/main.py 
     sed -i "s|TABLE_ID|${local.table_id}|g" ../src/bq-query-function/main.py 
     
@@ -92,7 +92,7 @@ resource "google_cloudfunctions_function" "bq_query_function" {
 
     # Get the source code of the cloud function as a Zip compression
     source_archive_bucket = google_storage_bucket.function_bucket.name
-    source_archive_object = google_storage_bucket_object.bq_export_zip.name
+    source_archive_object = google_storage_bucket_object.bq_function_zip.name
 
     # Must match the function name in the cloud function `main.py` source code
     entry_point           = "bq_query_zipcode"
