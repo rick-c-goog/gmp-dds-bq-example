@@ -103,7 +103,7 @@ resource "google_cloudfunctions_function" "bq_query_function" {
     # Dependencies are automatically inferred so these lines can be deleted
     depends_on            = [
         google_storage_bucket.function_bucket,  # declared in `storage.tf`
-        google_storage_bucket_object.bq_export_zip
+        google_storage_bucket_object.bq_function_zip
     ]
 }
 
