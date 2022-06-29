@@ -10,7 +10,7 @@ function initMap() {
       zoom: 5,
       // In the cloud console, configure this Map ID with a style that enables the
       // "Administrative Area Level 1" feature layer.
-      mapId: "4b345b7e5b9aee67",
+      mapId: "YourMapID",
     });
     //@ts-ignore
     const featureLayer = map.getFeatureLayer(
