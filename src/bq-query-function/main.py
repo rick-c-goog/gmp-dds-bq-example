@@ -20,12 +20,12 @@ def bq_query_zipcode(request):
   # Month abbreviation, day and year
   
   dataset_ref = google.cloud.bigquery.DatasetReference(project, dataset_id)
-  query = """
-       select  zip_code, sum(population) as population from `bigquery-public-data.census_bureau_usa.population_by_zip_2010` as zip_pop inner join `bigquery-public-data.geo_us_boundaries.zip_codes` as zip_geom on lpad(zipcode,5,'0')=zip_geom.zip_code  where city='New York city' group by zip_code
-    """
+  
   #table_ref = dataset_ref.table(table_id)
   args = request.args
   queryType = args.get('name')
+  if queryType is None:
+    return "Please append URL with parameter: ?name=citibike or ?name=population"
   if queryType == "citibike":
      query = """
         WITH
@@ -70,7 +70,12 @@ SELECT
 FROM zipcode_geom inner join station_geom on ST_CONTAINS(zipcode_geom.zip_geom, station_geom.station_geom) join stationstats on station_geom.station_id=stationstats.station_name
 Group By zipcode_geom.zipcode
     """
-  
+  elif queryType == "population":
+     query = """
+       select  zip_code, sum(population) as population from `bigquery-public-data.census_bureau_usa.population_by_zip_2010` as zip_pop inner join `bigquery-public-data.geo_us_boundaries.zip_codes` as zip_geom on lpad(zipcode,5,'0')=zip_geom.zip_code  where city='New York city' group by zip_code
+    """
+  else:
+    return "Invalid parameter, append URL with parameter: ?name=citibike or ?name=population "
   query_job = client.query(query)  # Make an API request.
 
   result=[]
