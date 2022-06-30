@@ -9,11 +9,25 @@
   <head>
     <title>Choropleth Map</title>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
     <link rel="stylesheet" type="text/css" href="./style.css" />
     <script type="module" src="./index.js"></script>
   </head>
   <body>
+    <div id="controls" class="nicebox">
+    <div>
+        <select id="census-variable" >
+            <option
+            value="citibike">
+            Citibike rides by ZipCode In NYC
+          </option>
+            <option
+            value="population">
+            Population By ZipCode In NYC
+          </option>
+        
+        </select>
+      </div>
+    </div>
     <div id="map"></div>
 
     <!-- 
@@ -23,7 +37,7 @@
      with https://www.npmjs.com/package/@googlemaps/js-api-loader.
     -->
     <script
-      src="https://maps.googleapis.com/maps/api/js?key=YourMapAPIKey&callback=initMap&v=beta"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9sEEzbN3H0U1o-PJPJQTWAIJV33pjdKU&callback=initMap&v=beta"
       defer
     ></script>
   </body>

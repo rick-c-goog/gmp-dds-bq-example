@@ -22,4 +22,38 @@
     padding: 0;
   }
   
+  .nicebox {
+    position: absolute;
+    text-align: center;
+    font-family: "Roboto", "Arial", sans-serif;
+    font-size: 13px;
+    z-index: 5;
+    box-shadow: 0 4px 6px -4px #333;
+    padding: 5px 10px;
+    background: rgb(255, 255, 255);
+    background: linear-gradient(to bottom, rgb(232, 227, 227) 0%, rgb(245, 245, 245) 100%);
+    border: rgb(229, 229, 229) 1px solid;
+  }
+  
+  #controls {
+    top: 10px;
+    left: 110px;
+    width: 360px;
+    height: 45px;
+  }
+  
+  #data-box {
+    top: 10px;
+    left: 500px;
+    height: 45px;
+    line-height: 45px;
+    display: none;
+  }
+  
+  #census-variable {
+    width: 360px;
+    height: 20px;
+  }
+  
+
   /* [END maps_boundaries_choropleth] */

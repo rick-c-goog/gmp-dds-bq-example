@@ -4,98 +4,89 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 // [START maps_boundaries_choropleth]
+let map;
+let featureLayer;
+var populationData = {};
 function initMap() {
-    const map = new google.maps.Map(document.getElementById("map"), {
+      map = new google.maps.Map(document.getElementById("map"), {
       center: {lat: 40.75335534636303, lng: -73.97321568846345},
-      zoom: 5,
+      zoom: 14,
       // In the cloud console, configure this Map ID with a style that enables the
       // "Administrative Area Level 1" feature layer.
-      mapId: "YourMapID",
+      mapId: "4b345b7e5b9aee67",
     });
     //@ts-ignore
-    const featureLayer = map.getFeatureLayer(
-      google.maps.FeatureType.ADMINISTRATIVE_AREA_LEVEL_1
+    featureLayer = map.getFeatureLayer(
+      google.maps.FeatureType.POSTAL_CODE
     );
+    
+     // wire up the button
+  const selectBox = document.getElementById("census-variable");
+
+  google.maps.event.addDomListener(selectBox, "change", () => {
+    loadCensusData(selectBox.options[selectBox.selectedIndex].value);
+  });
+  // state polygons only need to be loaded once, do them now
   
     // [START maps_boundaries_choropleth_style_function]
-    featureLayer.style = (placeFeature) => {
-      const population = states[placeFeature.feature.displayName];
-      let fillColor;
-  
-      // Specify colors using any of the following:
-      // * Named ('green')
-      // * Hexadecimal ('#FF0000')
-      // * RGB ('rgb(0, 0, 255)')
-      // * HSL ('hsl(60, 100%, 50%)')
-      if (population < 2000000) {
-        fillColor = "green";
-      } else if (population < 5000000) {
-        fillColor = "red";
-      } else if (population < 10000000) {
-        fillColor = "blue";
-      } else if (population < 40000000) {
-        fillColor = "yellow";
-      }
-      return {
-        fillColor,
-        fillOpacity: 0.5,
-      };
-    };
-  
-    // Population data by state.
-    const states = {
-      Alabama: 5039877,
-      Alaska: 732673,
-      Arizona: 7276316,
-      Arkansas: 3025891,
-      California: 39237836,
-      Colorado: 5812069,
-      Connecticut: 3605597,
-      Delaware: 1003384,
-      Florida: 21781128,
-      Georgia: 10799566,
-      Hawaii: 1441553,
-      Idaho: 1900923,
-      Illinois: 12671469,
-      Indiana: 6805985,
-      Iowa: 3193079,
-      Kansas: 2934582,
-      Kentucky: 4509394,
-      Louisiana: 4624047,
-      Maine: 1372247,
-      Maryland: 6165129,
-      Massachusetts: 6984723,
-      Michigan: 10050811,
-      Minnesota: 5707390,
-      Mississippi: 2949965,
-      Missouri: 6168187,
-      Montana: 1104271,
-      Nebraska: 1963692,
-      Nevada: 3143991,
-      "New Hampshire": 1388992,
-      "New Jersey": 9267130,
-      "New Mexico": 2115877,
-      "New York": 19835913,
-      "North Carolina": 10551162,
-      "North Dakota": 774948,
-      Ohio: 11780017,
-      Oklahoma: 3986639,
-      Oregon: 4246155,
-      Pennsylvania: 12964056,
-      "Rhode Island": 1095610,
-      "South Carolina": 5190705,
-      "South Dakota": 895376,
-      Tennessee: 6975218,
-      Texas: 29527941,
-      Utah: 3337975,
-      Vermont: 645570,
-      Virginia: 8642274,
-      Washington: 7738692,
-      "West Virginia": 1782959,
-      Wisconsin: 5895908,
-      Wyoming: 578803,
-    };
+    
+    
     // [END maps_boundaries_choropleth_style_function]
+  }
+  
+
+  //start with get data function
+  /**
+ * Loads the census data from a simulated API call to the US Census API.
+ *
+ * @param {string} variable
+ */
+function loadCensusData(variable) {
+    // load the requested variable from the census API (using local copies)
+    //alert("https://us-east1-rick-geo-enterprise.cloudfunctions.net/bq-zipcode-function?name="+variable)
+    populationData={};
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "https://us-east1-rick-geo-enterprise.cloudfunctions.net/bq-zipcode-function?name="+variable );
+    xhr.onload = function () {
+      const censusData = JSON.parse(xhr.responseText);
+      //censusData.shift(); // the first row contains column names
+      censusData.forEach((row) => {
+        const censusVariable = parseInt(row["population"]);
+        const zipcode = row["zipcode"];
+        populationData[zipcode]=censusVariable;
+      });
+      //alert(populationData["10001"]);
+      featureLayer.style = (placeFeature) => {
+        const population = populationData[placeFeature.feature.displayName];
+        let fillColor;
+    
+        // Specify colors using any of the following:
+        // * Named ('green')
+        // * Hexadecimal ('#FF0000')
+        // * RGB ('rgb(0, 0, 255)')
+        // * HSL ('hsl(60, 100%, 50%)')
+        if (population < 2000000) {
+          fillColor = "pink";
+        } else if (population < 50000) {
+          fillColor = "green";
+        } else if (population < 100000) {
+          fillColor = "blue";
+        } else if (population < 300000) {
+          fillColor = "yellow";
+        }else if (population < 500000) {
+            fillColor = "red";
+        }
+        return {
+          fillColor,
+          fillOpacity: 0.5,
+        };
+      };      
+    }
+    xhr.onerror = function() {
+        alert('Error ');
+    }
+  
+    xhr.send();
   }
   
   window.initMap = initMap;

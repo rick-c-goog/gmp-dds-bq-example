@@ -87,4 +87,13 @@ Group By zipcode_geom.zipcode
         result.append({"zipcode": row["zip_code"], "population": row["population"]})
         
     # [END bigquery_query]
-  return make_response(jsonify(result), 200)
+  
+           
+  response=make_response(jsonify(result), 200)
+  response.headers['Access-Control-Allow-Origin']='*'
+  #response.headers['Access-Control-Allow-Methods']='GET'
+  response.headers['Access-Control-Allow-Headers']='Origin, X-Requested-With, Content-Type, Accept'
+  response.headers['Content-Type']='application/json'
+  #response.headers['Access-Control-Max-Age']='3600'
+     
+  return response
