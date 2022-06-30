@@ -21,8 +21,7 @@ def bq_query_zipcode(request):
   
   dataset_ref = google.cloud.bigquery.DatasetReference(project, dataset_id)
   query = """
-        SELECT  lpad(zipcode,5,'0') as zipcode,population FROM `bigquery-public-data.census_bureau_usa.population_by_zip_2010` where left(lpad(zipcode,5,'0'),3) in ('100','101','102','103','104','111','112','113','114') and population>0
-
+       select  zip_code, sum(population) as population from `bigquery-public-data.census_bureau_usa.population_by_zip_2010` as zip_pop inner join `bigquery-public-data.geo_us_boundaries.zip_codes` as zip_geom on lpad(zipcode,5,'0')=zip_geom.zip_code  where city='New York city' group by zip_code
     """
   #table_ref = dataset_ref.table(table_id)
   args = request.args
