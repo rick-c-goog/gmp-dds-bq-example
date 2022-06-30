@@ -84,7 +84,7 @@ Group By zipcode_geom.zipcode
       if  queryType == "citibike": 
         result.append({"zipcode": row["zipcode"], "rides": row["total_trips"]})
       elif queryType == "population":
-        result.append({"zipcode": row["zipcode"], "population": row["population"]})
+        result.append({"zipcode": row["zip_code"], "population": row["population"]})
         
     # [END bigquery_query]
   return make_response(jsonify(result), 200)
