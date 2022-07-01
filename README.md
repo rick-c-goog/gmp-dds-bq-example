@@ -17,3 +17,5 @@ Validation steps:
 - Click bq-zipcode-function, click "Trigger" tab, note Trigger URL, click the trigger URL, open it in browser, the page shows empty []
 - In browser opened trigger url, append the URL with ?name=population
 - Try the same append the URL with ?name=citibike 
+
+## 2. Test Google Map Data Driven Style
