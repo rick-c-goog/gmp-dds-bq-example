@@ -33,6 +33,26 @@ resource "time_sleep" "sleep_after_activate_service_apis" {
   ]
 }
 
+/******************************************
+2. Project-scoped Org Policy Relaxing
+*****************************************/
+
+module "org_policy_disable_serial_port_logging" {
+  source      = "terraform-google-modules/org-policy/google"
+  policy_for  = "project"
+  project_id  = var.project_id
+  constraint  = "constraints/cloudfunctions.allowedIngressSettings"
+  
+ 
+  list_policy {
+    allow {
+      all = true
+    }
+  }
+  depends_on = [
+    time_sleep.sleep_after_activate_service_apis
+  ]
+}
 
 
 /******************************************
