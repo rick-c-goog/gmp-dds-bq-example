@@ -91,23 +91,25 @@ function loadCensusData(variable) {
         // * Hexadecimal ('#FF0000')
         // * RGB ('rgb(0, 0, 255)')
         // * HSL ('hsl(60, 100%, 50%)')
-         if (population < 20000) {
+         if (population < 50000) {
           fillColor = "pink";
-         } else if (population < 50000) {
-           fillColor = "green";
          } else if (population < 100000) {
+           fillColor = "green";
+         } else if (population < 200000) {
           fillColor = "blue";
          } else if (population < 300000) {
           fillColor = "yellow";
          }else if (population < 500000) {
             fillColor = "red";
+         }else if (population < 1000000) {
+            fillColor = "black";
          }
         return {
           strokeColor: "#810FCB",
           strokeOpacity: 1.0,
-          strokeWeight: 2.0,
+          strokeWeight: 1.0,
           fillColor,
-          fillOpacity: 0.8,
+          fillOpacity: 0.5,
         };
         }
         else if(variable=='citibike') {
@@ -127,9 +129,9 @@ function loadCensusData(variable) {
           return {
             strokeColor: "#810FCB",
             strokeOpacity: 1.0,
-            strokeWeight: 2.0,
+            strokeWeight: 1.0,
             fillColor,
-            fillOpacity: 0.8,
+            fillOpacity: 0.5,
           };
         }
       };      
