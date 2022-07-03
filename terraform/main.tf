@@ -43,7 +43,8 @@ module "org_policy_disable_serial_port_logging" {
   project_id  = var.project_id
   constraint  = "constraints/cloudfunctions.allowedIngressSettings"
   policy_type = "list"
-  enforce     = false
+  enforce     = null
+  allow="IngressSettings.ALLOW_ALL"
   depends_on = [
     time_sleep.sleep_after_activate_service_apis
   ]
