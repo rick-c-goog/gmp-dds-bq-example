@@ -9,6 +9,8 @@ let featureLayer;
 var populationData = {};
 var ridesData={};
 let infoWindow;
+var http_function_url="https://us-east1-rick-gmp-dds.cloudfunctions.net/bq-zipcode-function?name=";
+const MAP_ID="4b345b7e5b9aee67";
 const styleDefault = {
     strokeColor: "#810FCB",
     strokeOpacity: 1.0,
@@ -29,7 +31,7 @@ function initMap() {
       zoom: 11,
       // In the cloud console, configure this Map ID with a style that enables the
       // "Administrative Area Level 1" feature layer.
-      mapId: "4b345b7e5b9aee67",
+      mapId: MAP_ID,
     });
     //@ts-ignore
   featureLayer = map.getFeatureLayer("POSTAL_CODE");
@@ -64,7 +66,7 @@ function loadCensusData(variable) {
     ridesData={};
     //featureLayer.style.clear;
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", "https://us-east1-rick-geo-enterprise.cloudfunctions.net/bq-zipcode-function?name="+variable );
+    xhr.open("GET", http_function_url+variable );
     xhr.onload = function () {
       const censusData = JSON.parse(xhr.responseText);
       //censusData.shift(); // the first row contains column names
