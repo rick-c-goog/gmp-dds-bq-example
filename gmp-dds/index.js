@@ -9,8 +9,8 @@ let featureLayer;
 var populationData = {};
 var ridesData={};
 let infoWindow;
-var http_function_url="https://us-east1-rick-gmp-dds.cloudfunctions.net/bq-zipcode-function?name=";
-const MAP_ID="4b345b7e5b9aee67";
+var http_function_url="https://us-east1-rick-gmp-dds.cloudfunctions.net/bq-zipcode-function";
+const MAP_ID="YOUR_MAP_ID";
 const styleDefault = {
     strokeColor: "#810FCB",
     strokeOpacity: 1.0,
@@ -66,7 +66,7 @@ function loadCensusData(variable) {
     ridesData={};
     //featureLayer.style.clear;
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", http_function_url+variable );
+    xhr.open("GET", http_function_url+"?name="+variable );
     xhr.onload = function () {
       const censusData = JSON.parse(xhr.responseText);
       //censusData.shift(); // the first row contains column names
