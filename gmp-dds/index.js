@@ -9,8 +9,8 @@ let featureLayer;
 var populationData = {};
 var ridesData={};
 let infoWindow;
-var http_function_url="https://us-east1-rick-gmp-dds.cloudfunctions.net/bq-zipcode-function";
-const MAP_ID="YOUR_MAP_ID";
+var http_function_url="https://us-east1-XXXXX.cloudfunctions.net/bq-zipcode-function";
+const MAP_ID="MAPID";
 const styleDefault = {
     strokeColor: "#810FCB",
     strokeOpacity: 1.0,
@@ -193,4 +193,3 @@ function updateInfoWindow(content, center) {
 //@ts-ignore
     
   window.initMap = initMap;
-  // [END maps_boundaries_choropleth]
