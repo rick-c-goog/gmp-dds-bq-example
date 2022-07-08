@@ -9,6 +9,7 @@ let featureLayer;
 var populationData = {};
 var ridesData={};
 let infoWindow;
+let selection;
 var http_function_url="https://us-east1-XXXXX.cloudfunctions.net/bq-zipcode-function";
 const MAP_ID="MAPID";
 const styleDefault = {
@@ -42,7 +43,10 @@ function initMap() {
   const selectBox = document.getElementById("census-variable");
   
   google.maps.event.addDomListener(selectBox, "change", () => {
-    loadCensusData(selectBox.options[selectBox.selectedIndex].value);
+    selection=selectBox.options[selectBox.selectedIndex].value;
+    if(selection=="population")
+    { loadPopulationData(selection); }
+    else { loadCitibikeData(selection);}
   });
   // state polygons only need to be loaded once, do them now
   
@@ -59,51 +63,38 @@ function initMap() {
  *
  * @param {string} variable
  */
-function loadCensusData(variable) {
+function loadPopulationData(variable) {
     // load the requested variable from the census API (using local copies)
     //alert("https://us-east1-rick-geo-enterprise.cloudfunctions.net/bq-zipcode-function?name="+variable)
     populationData={};
-    ridesData={};
     //featureLayer.style.clear;
     const xhr = new XMLHttpRequest();
     xhr.open("GET", http_function_url+"?name="+variable );
     xhr.onload = function () {
-      const censusData = JSON.parse(xhr.responseText);
-      //censusData.shift(); // the first row contains column names
-      if(variable=='population') {  
+      const censusData = JSON.parse(xhr.responseText); 
       censusData.forEach((row) => {
         const censusVariable = parseInt(row["population"]);
         const zipcode = row["zipcode"];
         populationData[zipcode]=censusVariable;
       });
-     }else if(variable=='citibike'){
-        censusData.forEach((row) => {
-            const bikeVariable = parseInt(row["rides"]);
-            const zipcode = row["zipcode"];
-            ridesData[zipcode]=bikeVariable;
-          });
-     }
-      //alert(populationData["10001"]);
       let fillColor;
       featureLayer.style = (placeFeature) => {
-       if(variable=='population') {
+       //if(variable=='population') {
          const population = populationData[placeFeature.feature.displayName];
         // Specify colors using any of the following:
         // * Named ('green')
         // * Hexadecimal ('#FF0000')
         // * RGB ('rgb(0, 0, 255)')
         // * HSL ('hsl(60, 100%, 50%)')
-         if (population < 50000) {
-          fillColor = "pink";
-         } else if (population < 100000) {
+         if (population < 10000) {
            fillColor = "green";
-         } else if (population < 200000) {
+         } else if (population < 20000) {
           fillColor = "blue";
-         } else if (population < 300000) {
+         } else if (population < 50000) {
           fillColor = "yellow";
-         }else if (population < 500000) {
+         }else if (population < 100000) {
             fillColor = "red";
-         }else if (population < 1000000) {
+         }else if (population < 300000) {
             fillColor = "black";
          }
         return {
@@ -113,8 +104,36 @@ function loadCensusData(variable) {
           fillColor,
           fillOpacity: 0.5,
         };
-        }
-        else if(variable=='citibike') {
+      //  }
+        
+      };      
+    }
+    xhr.onerror = function() {
+        alert('Error ');
+    }
+  
+    xhr.send();
+  }
+
+
+  function loadCitibikeData(variable) {
+    // load the requested variable from the census API (using local copies)
+    //alert("https://us-east1-rick-geo-enterprise.cloudfunctions.net/bq-zipcode-function?name="+variable)
+    populationData={};
+    ridesData={};
+    //featureLayer.style.clear;
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", http_function_url+"?name="+variable );
+    xhr.onload = function () {
+      const censusData = JSON.parse(xhr.responseText);
+      censusData.forEach((row) => {
+            const bikeVariable = parseInt(row["rides"]);
+            const zipcode = row["zipcode"];
+            ridesData[zipcode]=bikeVariable;
+          });
+      //alert(populationData["10001"]);
+      let fillColor;
+      featureLayer.style = (placeFeature) => {
          let fillColor;
          const rides = ridesData[placeFeature.feature.displayName];
          if (rides < 5000) {
@@ -135,7 +154,6 @@ function loadCensusData(variable) {
             fillColor,
             fillOpacity: 0.5,
           };
-        }
       };      
     }
     xhr.onerror = function() {
@@ -153,17 +171,21 @@ function loadCensusData(variable) {
   
     // Apply the style to the feature layer.
     applyStyleToSelected(feature.placeId);
-  
+    let clickValue, dataType;
+    if(selection=="population") {
+      clickValue=population[feature.displayName];
+    }
+    else clickValue=ridesData[feature.displayName]
     // Add the info window.
     let content =
       '<span style="font-size:small">Display name: ' +
       feature.displayName +
       "<br/> Place ID: " +
       feature.placeId +
-      "<br/> Feature type: " +
-      feature.featureType +
+      "<br/> "+ selection +": " +
+      clickValue +
       "</span>";
-  
+    
     updateInfoWindow(content, event.latLng);
   }
   
