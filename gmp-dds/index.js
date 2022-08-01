@@ -86,16 +86,17 @@ function loadPopulationData(variable) {
         // * Hexadecimal ('#FF0000')
         // * RGB ('rgb(0, 0, 255)')
         // * HSL ('hsl(60, 100%, 50%)')
-         if (population < 10000) {
-           fillColor = "green";
-         } else if (population < 20000) {
-          fillColor = "blue";
+        if(population==null) return styleDefault;
+        if (population>=0 && population < 10000) {
+           fillColor = "gray";
          } else if (population < 50000) {
+          fillColor = "blue";
+         } else if (population < 100000) {
           fillColor = "yellow";
-         }else if (population < 100000) {
+         }else if (population < 200000) {
+            fillColor = "green";
+         }else if (population < 400000) {
             fillColor = "red";
-         }else if (population < 300000) {
-            fillColor = "black";
          }
         return {
           strokeColor: "#810FCB",
@@ -173,7 +174,7 @@ function loadPopulationData(variable) {
     applyStyleToSelected(feature.placeId);
     let clickValue, dataType;
     if(selection=="population") {
-      clickValue=population[feature.displayName];
+      clickValue=populationData[feature.displayName];
     }
     else clickValue=ridesData[feature.displayName]
     // Add the info window.
